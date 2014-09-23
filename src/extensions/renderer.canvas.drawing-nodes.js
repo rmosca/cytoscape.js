@@ -199,6 +199,8 @@
       // reset in case we changed the border style
       context.setLineDash([ ]);
 
+      this.drawNodeAnnotations(context, node, drawOverlayInstead);
+      
     // draw the overlay
     } else {
 
@@ -278,6 +280,200 @@
       lastPercent += percent;
     }
 
+  };
+
+  // Draw node annotations
+  CanvasRenderer.prototype.drawNodeAnnotations = function(context, node, drawOverlayInstead) {
+    var nodeWidth = this.getNodeWidth(node);
+    var nodeHeight = this.getNodeHeight(node);
+
+    // Annotations, for the moment are drown only for circular nodes
+    if( this.getNodeShape(node) != 'ellipse' || nodeWidth != nodeHeight ||
+        typeof node.data().nodeAnnotations === 'undefined' ) {
+      return;
+    }
+    
+    var annSize = node._private.style["ann-size"].value;
+    var annVertSpacing = annSize / 2.0;
+    var annHorizSpacing = annSize / 2.0;
+    var annSpaceMult    = 3.0;
+    
+    var lNodeAnnotations = node.data().nodeAnnotations;
+    var nodeWidth = this.getNodeWidth(node);
+    var nodeHeight = this.getNodeHeight(node);
+    var nodeBorderWidth = node._private.style["border-width"].value;
+    
+    var ringWidth = 2.0 * annSize + 0.5;
+    
+    // First I need to make the "buried" area darker
+    context.fillStyle = "rgba( " + node._private.style["border-color"].value[0] + ","
+                                 + node._private.style["border-color"].value[1] + ","
+                                 + node._private.style["border-color"].value[2] + ", 0.3 )";
+
+    var coreRingWidth = nodeWidth - nodeBorderWidth - 2.0 * ringWidth;
+    CanvasRenderer.nodeShapes["ellipse"].draw(
+      context,
+      node._private.position.x,
+      node._private.position.y,
+      coreRingWidth,
+      coreRingWidth
+    );
+    
+    var numSurfAnns = 0;
+    var numCoreAnns = 0;
+    var numUnknAnns = 0;
+    for (var i = 0; i < lNodeAnnotations.length; ++i) {
+      if ( lNodeAnnotations[i].type == "surface" ){
+        ++numSurfAnns;
+      } else if( lNodeAnnotations[i].type == "core" ) {
+        ++numCoreAnns;
+      } else if( lNodeAnnotations[i].type == "unknown" ) {
+        ++numUnknAnns;
+      }
+    }
+    
+    if( numSurfAnns > 0 ) {
+      var surfRingRadius = (nodeWidth-nodeBorderWidth-ringWidth)/2.0;
+      var annDispl = Math.min( 2.0 * Math.PI / numSurfAnns, (annSpaceMult*annSize)/surfRingRadius );
+      var sAnnIndex = 0;
+      for (var i = 0; i < lNodeAnnotations.length; ++i) {
+        var annotation = lNodeAnnotations[i];
+        if( annotation.type == "surface" ) {
+          var angle = annDispl * sAnnIndex;
+          var ax = node._private.position.x + surfRingRadius * Math.sin(angle);
+          var ay = node._private.position.y - surfRingRadius * Math.cos(angle);
+          context.fillStyle = annotation.color;
+          this.drawNodeAnnotationShape(context,annotation.shape,ax,ay,annSize,angle);
+          ++sAnnIndex;
+        }
+      }
+    }
+    if( numCoreAnns > 0 ) {
+      var coreRingRadius = (nodeWidth-nodeBorderWidth-2.0*ringWidth)/4.0;
+      var annDispl = 2.0 * Math.PI / numCoreAnns;
+      var cAnnIndex = 0;
+      for (var i = 0; i < lNodeAnnotations.length; ++i) {
+        var annotation = lNodeAnnotations[i];
+        if( annotation.type == "core" ) {
+          var angle = annDispl * cAnnIndex;
+          var ax = node._private.position.x + coreRingRadius * Math.sin(angle);
+          var ay = node._private.position.y - coreRingRadius * Math.cos(angle);
+          context.fillStyle = annotation.color;
+          this.drawNodeAnnotationShape(context,annotation.shape,ax,ay,annSize,angle);
+          ++cAnnIndex;
+        }
+      }
+    }
+    if( numUnknAnns > 0 ) {
+      var annDispl = 2.0 * annSize + annHorizSpacing;
+      
+      var labelStyle   = node._private.style["font-style"].strValue;
+      var labelSize    = node._private.style["font-size"].value + "px";
+      var labelFamily  = node._private.style["font-family"].strValue;
+      //var labelVariant = node._private.style["font-variant"].strValue;
+      var labelWeight  = node._private.style["font-weight"].strValue;
+      
+      context.font = labelStyle + " " + labelWeight + " "
+                     + labelSize + " " + labelFamily;
+      
+      var text = String(node._private.style["content"].value);
+      var textTransform = node._private.style["text-transform"].value;
+      
+      if (textTransform == "none") {
+      } else if (textTransform == "uppercase") {
+        text = text.toUpperCase();
+      } else if (textTransform == "lowercase") {
+        text = text.toLowerCase();
+      }
+      
+      // Calculate text draw position based on text alignment
+     var textWidth, textHeight;
+      if (text != undefined) {
+        // record the text's width for use in bounding box calc
+        textWidth = context.measureText( text ).width;
+        textHeight = node._private.style["font-size"].value * 1.3;
+      } else {
+        textWidth = 0;
+        textHeight = 0;
+      }
+
+      //var textHorizSpacing = node._private.style["font-size"].pxValue * 0.5;
+      //var textVertSpacing  = node._private.style["font-size"].pxValue * 0.5;
+      
+      var textHorizSpacing = 0;
+      var textVertSpacing  = 0;
+
+      var textX, textY, annXstart, annYstart;
+
+      var textHalign = node._private.style["text-halign"].strValue;
+      if (textHalign == "left") {
+        // Align right boundary of text with left boundary of node
+        textX = node._private.position.x - nodeWidth / 2 - textHorizSpacing;
+        annXstart = textX - textWidth;
+      } else if (textHalign == "right") {
+        // Align left boundary of text with right boundary of node
+        textX = node._private.position.x + nodeWidth / 2 + textHorizSpacing;
+        annXstart = textX;
+      } else if (textHalign == "center") {
+        textX = node._private.position.x;
+        annXstart = textX - textWidth / 2;
+      } else {
+        // Same as center
+        textX = node._private.position.x;
+        annXstart = textX - textWidth / 2;
+      }
+      
+      var textValign = node._private.style["text-valign"].strValue;
+      if (textValign == "top") {
+        textY = node._private.position.y - nodeHeight / 2 - textVertSpacing;
+        annYstart = textY - textHeight - annSize - annVertSpacing;
+      } else if (textValign == "bottom") {
+        textY = node._private.position.y + nodeHeight / 2 + textVertSpacing;
+        annYstart = textY + textHeight + annVertSpacing;
+      } else if (textValign == "middle" || textValign == "center") {
+        textY = node._private.position.y;
+        annYstart = textY + textHeight / 2 + annVertSpacing;
+      } else {
+        // same as center
+        textY = node._private.position.y;
+        annYstart = textY + textHeight / 2 + annVertSpacing;
+      }
+      
+      annXstart += annSize;
+      
+      var uAnnIndex = 0;
+      for (var i = 0; i < lNodeAnnotations.length; ++i) {
+        var annotation = lNodeAnnotations[i];
+        if( annotation.type == "unknown" ) {
+          var ax = annXstart + annDispl * uAnnIndex;
+          context.fillStyle = annotation.color;
+          this.drawNodeAnnotationShape(context,annotation.shape,ax,annYstart,annSize,0);
+          ++uAnnIndex;
+        }
+      }
+    }
+  };
+
+  // Draw edge annotation shapes
+  CanvasRenderer.prototype.drawNodeAnnotationShape = function(context, shape, annPosX, annPosY, size, angle) {
+  
+    context.translate(annPosX, annPosY);
+    
+    context.moveTo(0, 0);
+
+    context.rotate(angle);
+    context.scale(size, size);
+    
+    context.beginPath();
+    CanvasRenderer.annotationShapes[shape].draw(context);
+    context.closePath();
+    
+    context.fill();
+
+    context.scale(1/size, 1/size);
+    context.rotate(-angle);
+    
+    context.translate(-annPosX, -annPosY);
   };
 
   
