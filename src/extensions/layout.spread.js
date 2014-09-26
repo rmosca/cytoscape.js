@@ -21,7 +21,7 @@
                                  // If it is set to -1.0 the amount of expansion is automatically
                                  // calculated based on the minDist, the aspect ratio and the
                                  // number of nodes
-    maxExpandIterations: 10,     // Maximum number of expanding iterations
+    maxExpandIterations: 4,     // Maximum number of expanding iterations
     simulationBounds: undefined  // [x1, y1, x2, y2]; [0, 0, width, height] by default
   };
   
@@ -41,7 +41,7 @@
     }
     return path;
   }
-
+  
   function cellCentroid( cell ) {
     var hes = cell.halfedges;
     var area = 0, x = 0, y = 0;
@@ -72,6 +72,9 @@
 
   SpreadLayout.prototype.run = function(){
 
+    var layout = this;
+    var self = this;
+    
     var options = this.options;
     var cy = options.cy;
     var allNodes = cy.nodes();
@@ -83,6 +86,8 @@
     var cHeight = container.clientHeight;
     var simulationBounds = options.simulationBounds;
     var padding = options.padding;
+
+    layout.trigger({ type: 'layoutstart', layout: layout });
 
     var simBB = { x1: 0, y1: 0, x2: cWidth, y2: cHeight };
     
@@ -101,8 +106,8 @@
     var width  = simBB.x2 - simBB.x1;
     var height = simBB.y2 - simBB.y1;
 
-    cy.one("layoutready", options.ready);
-    cy.trigger("layoutready");
+    layout.one("layoutready", options.ready);
+    layout.trigger("layoutready");
 
     // Get start time
     var startTime = new Date();
@@ -122,8 +127,8 @@
       var endTime = new Date();
       console.info("Layout on "+nodes.size()+" nodes took " + (endTime - startTime) + " ms");
 
-      cy.one("layoutstop", options.stop);
-      cy.trigger("layoutstop");
+      layout.one("layoutstop", options.stop);
+      layout.trigger("layoutstop");
 
       return;
     }
@@ -163,9 +168,9 @@
     var p = new Parallel( pData, { evalPath: evalScrPath } );
     
     // And to add the required scripts
-    p.require("graph.js");
-    p.require("random.js");
-    p.require("forcedirected.js");
+    p.require("foograph.js");
+    //p.require("random.js");
+    //p.require("forcedirected.js");
     p.require("rhill-voronoi-core.js");
     p.require(sitesDistance);
     p.require(cellCentroid);
@@ -190,7 +195,7 @@
          */
         
         // We need to create an instance of a graph compatible with the library
-        var frg = new Graph("FRgraph", false);
+        var frg = new foograph.Graph("FRgraph", false);
         
         var frgNodes = {};
         
@@ -198,7 +203,7 @@
         var dataVertices = pData['vertices'];
         for( var ni = 0; ni < dataVertices.length; ++ni ) {
           var id = dataVertices[ni]['id'];
-          var v = new Vertex( id, Math.round(Math.random()*lHeight), Math.round(Math.random()*lHeight) );
+          var v = new foograph.Vertex( id, Math.round(Math.random()*lHeight), Math.round(Math.random()*lHeight) );
           frgNodes[id] = v;
           frg.insertVertex(v);
         }
@@ -213,7 +218,7 @@
         var fv = frg.vertices;
     
         // Then we apply the layout
-        var frLayoutManager = new ForceDirectedVertexLayout(lWidth, lHeight, 400, false, 20);
+        var frLayoutManager = new foograph.ForceDirectedVertexLayout(lWidth, lHeight, 400, false, 20);
         
         frLayoutManager.layout(frg);
     
@@ -299,7 +304,7 @@
           if( currInfractions <= 0 ) {
             bStop = true;
           } else {
-            if( currInfractions >= prevInfractions || voronoiIteration >= 5 ) {
+            if( currInfractions >= prevInfractions || voronoiIteration >= 4 ) {
               if( expandIteration >= lMaxExpIt ) {
                 bStop = true;
               } else {
@@ -372,17 +377,18 @@
         var endTime = new Date();
         console.info("Layout on "+dataVertices.length+" nodes took " + (endTime - startTime) + " ms");
 
-        cy.one("layoutstop", options.stop);
-        cy.trigger("layoutstop");
+        layout.one("layoutstop", options.stop);
+        layout.trigger("layoutstop");
         
       }
     );
+    return this;
   };
 
   SpreadLayout.prototype.stop = function(){
   };
   
-  $$("layout", "spread", SpreadLayout);
+  $$('layout', 'spread', SpreadLayout);
   
   
 })(cytoscape);
