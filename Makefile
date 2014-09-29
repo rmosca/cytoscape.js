@@ -52,7 +52,11 @@ TEMP_DIR = /tmp
 TEMP_DOC_DIR_NAME = cy-docs-temp
 
 # dependencies for the .all.js file
-LIBS = $(LIB_DIR)/arbor.js
+LIBS = $(LIB_DIR)/arbor.js\
+	$(LIB_DIR)/eval.js\
+	$(LIB_DIR)/foograph.js\
+	$(LIB_DIR)/parallel.js\
+	$(LIB_DIR)/rhill-voronoi-core.js
 
 # the files that make up the cytoweb core
 CORE = $(SRC_DIR)/namespace.js\
@@ -95,6 +99,7 @@ CORE = $(SRC_DIR)/namespace.js\
 EXTENSIONS = $(EXTENSIONS_DIR)/renderer.null.js\
 	$(EXTENSIONS_DIR)/renderer.canvas.define-and-init-etc.js\
 	$(EXTENSIONS_DIR)/renderer.canvas.arrow-shapes.js\
+	$(EXTENSIONS_DIR)/renderer.canvas.annotation-shapes.js\
 	$(EXTENSIONS_DIR)/renderer.canvas.cached-eles.js\
 	$(EXTENSIONS_DIR)/renderer.canvas.coord-ele-math.js\
 	$(EXTENSIONS_DIR)/renderer.canvas.drawing-edges.js\
@@ -114,6 +119,7 @@ EXTENSIONS = $(EXTENSIONS_DIR)/renderer.null.js\
 	$(EXTENSIONS_DIR)/layout.circle.js\
 	$(EXTENSIONS_DIR)/layout.breadthfirst.js\
 	$(EXTENSIONS_DIR)/layout.cose.js\
+	$(EXTENSIONS_DIR)/layout.spread.js\
 
 
 # names of the cytoscape web release js files

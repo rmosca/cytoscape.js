@@ -146,7 +146,9 @@
 			this.drawArrowheads(context, edge, drawOverlayInstead);
 		}
 
-	}
+    this.drawEdgeAnnotations(context, edge, drawOverlayInstead);
+
+	};
 	
 	var _genPoints = function(pt, spacing, even) {
 		
@@ -169,7 +171,7 @@
 		}
 		
 		return pz;
-	}
+	};
 	
 	var _genStraightLinePoints = function(pt, spacing, even) {
 		
@@ -192,13 +194,13 @@
 		}
 		
 		return pz;
-	}
+	};
 	
 	var _genEvenOddpts = function(pt, evenspac, oddspac) {
 		
 		pt1 = _genpts(pt, evenspac);
 		pt2 = _genpts(pt, oddspac);
-	}
+	};
 	
 	
 	CanvasRenderer.prototype.drawStyledEdge = function(
@@ -463,7 +465,7 @@
 			this.drawArrowShape(context, edge._private.style["target-arrow-shape"].value,
 				endX, endY, dispX, dispY);
 		}
-	}
+	};
 	
 	// Draw arrowshape
 	CanvasRenderer.prototype.drawArrowShape = function(context, shape, x, y, dispX, dispY) {
@@ -502,6 +504,255 @@
 		context.rotate(angle);
 		context.translate(-x, -y);
 		//context.restore();
-	}
+	};
+
+  // Draw annotations on edge
+  CanvasRenderer.prototype.drawEdgeAnnotations = function(context, edge, drawOverlayInstead) {
+    if( drawOverlayInstead ){ return; } // don't do anything for overlays 
+
+    if( typeof edge.data().sourceAnnotations === 'undefined' &&
+        typeof edge.data().targetAnnotations === 'undefined' ) {
+      return;
+    }
+
+    var START_DISPL = 0.07;
+    var WIDTH_DISPL = 0.33;
+    var SPACE_MULT  = 2.4;
+
+    var START_SELF_DISPL = 0.33;
+    var WIDTH_SELF_DISPL = 0.32;
+    var SPACE_SELF_MULT  = 2.9;
+
+    function qbezierLen(p0x, p0y, p1x, p1y, p2x, p2y){
+      var ax = p0x - 2*p1x + p2x;  var ay = p0y - 2*p1y + p2y;
+      var bx = 2*p1x - 2*p0x;      var by = 2*p1y - 2*p0y;
+      var A = 4*(ax*ax + ay*ay);   var B = 4*(ax*bx + ay*by);
+      var C = bx*bx + by*by;       var Sabc = 2*Math.sqrt(A+B+C);
+      var A_2 = Math.sqrt(A);      var A_32 = 2*A*A_2;
+      var C_2 = 2*Math.sqrt(C);    var BA = B/A_2;
+      return (A_32*Sabc + A_2*B*(Sabc-C_2) + (4*C*A-B*B)*Math.log( (2*A_2+BA+Sabc)/(BA+C_2) ))/(4*A_32);
+    }
+
+    function qbezierAt(p0, p1, p2, t){
+      return (1 - t)*(1 - t)*p0 + 2*(1 - t)*t*p1 + t*t*p2;
+    }
+
+    function qbezierDeltaAt(p0, p1, p2, t){
+      return (t-1)*p0 + (1-2*t)*p1 + t*p2;
+    }
+
+    var annSize = edge._private.style["ann-size"].value;
+    var details = edge._private.rscratch;
+
+    // Instead of the edge starting point we take the arrow starting point in
+    // order to avoid overlaps with the node body. Slightly imprecise but
+    // I don't think anyone will ever notice
+    var startX = details.startX;
+    var startY = details.startY;
+    var endX   = details.endX;
+    var endY   = details.endY;
+
+    if (details.edgeType == "straight") {
+
+      var exdispl = endX-startX;
+      var eydispl = endY-startY;
+      var elen    = Math.sqrt(exdispl*exdispl + eydispl*eydispl);
+      var angle = 0.0;
+      if( exdispl == 0 ) {
+        if( eydispl > 0 ) {
+          angle = 0;
+        } else {
+          angle = Math.PI;
+        }
+      } else {
+        angle = Math.atan( (eydispl/exdispl) );
+        if( exdispl < 0 ) {
+          angle += Math.PI;
+        }
+      }
+      if( typeof edge.data().sourceAnnotations != 'undefined' ) {
+        var lSourceAnnotations = edge.data().sourceAnnotations;
+        var displ      = Math.max(Math.min(((SPACE_MULT*annSize)/elen),(WIDTH_DISPL-annSize/elen)/lSourceAnnotations.length),0.0);
+        var startDispl = Math.min(START_DISPL+annSize/(2.0*elen),START_DISPL+WIDTH_DISPL/2.0);
+        for (var i = 0; i < lSourceAnnotations.length; ++i) {
+          var annotation = lSourceAnnotations[i];
+          
+          var annPosX = startX + exdispl * (startDispl + i * displ);
+          var annPosY = startY + eydispl * (startDispl + i * displ);
+
+          context.fillStyle = annotation.color;
+          this.drawEdgeAnnotationShape(context, annotation.shape,
+                annPosX, annPosY, annSize, angle);
+        }
+      }
+
+      if( typeof edge.data().targetAnnotations != 'undefined' ) {
+        var lTargetAnnotations = edge.data().targetAnnotations;
+        var displ      = Math.max(Math.min(((SPACE_MULT*annSize)/elen),(WIDTH_DISPL-annSize/elen)/lTargetAnnotations.length),0.0);
+        var startDispl = Math.min(START_DISPL+annSize/(2.0*elen),START_DISPL+WIDTH_DISPL/2.0);
+        for (var i = 0; i < lTargetAnnotations.length; i++) {
+          var annotation = lTargetAnnotations[i];
+  
+          var annPosX = endX - exdispl * (startDispl + i * displ);
+          var annPosY = endY - eydispl * (startDispl + i * displ);
+          
+          context.fillStyle = annotation.color;
+          this.drawEdgeAnnotationShape(context, annotation.shape,
+                annPosX, annPosY, annSize, angle+Math.PI);
+        }
+      }
+      
+    } else if (details.edgeType == "self"){
+
+      // TODO: (Roberto) Modify this code to cope with a generic self-edge.
+      // Currently runs under the assumption that the self edge is simmetrical
+      // as in the new design
+      //
+      // !Please notice! Target annotations for self-edges are simply ignored
+
+      if( typeof edge.data().sourceAnnotations != 'undefined' ) {
+        var lSourceAnnotations = edge.data().sourceAnnotations;
+        var elen    = 2.0*qbezierLen(startX, startY, details.cp2ax, details.cp2ay, details.selfEdgeMidX, details.selfEdgeMidY);
+        var displ   = Math.max(Math.min(((SPACE_SELF_MULT*annSize)/elen),(WIDTH_SELF_DISPL-annSize/elen)/lSourceAnnotations.length),0.0);
+        var startDispl = Math.min(START_SELF_DISPL+annSize/(2.0*elen),START_SELF_DISPL+WIDTH_SELF_DISPL/2.0);
+  
+        for (var i = 0; i < lSourceAnnotations.length; ++i) {
+          var annotation = lSourceAnnotations[i];
+          
+          var t = startDispl + i * displ;
+          var p0, p1, p2;
+          if( t < 0.5 ) {
+            p0 = [ startX, startY ];
+            p1 = [ details.cp2ax, details.cp2ay ];
+            p2 = [ details.selfEdgeMidX, details.selfEdgeMidY ];
+            t  = 2.0*t;
+          } else {
+            p0 = [ details.selfEdgeMidX, details.selfEdgeMidY ];
+            p1 = [ details.cp2cx, details.cp2cy ];
+            p2 = [ endX, endY ];
+            t  = 2*(t-0.5);
+          }
+
+          var annPosX = qbezierAt(p0[0], p1[0], p2[0], t);
+          var annPosY = qbezierAt(p0[1], p1[1], p2[1], t);
+
+          var bxdispl = qbezierDeltaAt(p0[0], p1[0], p2[0], t);
+          var bydispl = qbezierDeltaAt(p0[1], p1[1], p2[1], t);
+
+          var angle = 0.0;
+          if( bxdispl == 0 ) {
+            if( bydispl > 0 ) {
+              angle = 0;
+            } else {
+              angle = Math.PI;
+            }
+          } else {
+            angle = Math.atan( (bydispl/bxdispl) );
+            if( bxdispl < 0 ) {
+              angle += Math.PI;
+            }
+          }
+
+          context.fillStyle = annotation.color;
+          this.drawEdgeAnnotationShape(context, annotation.shape,
+              annPosX, annPosY, annSize, angle);
+        }
+      }
+      
+    } else {
+
+      var elen    = qbezierLen(startX, startY, details.cp2x, details.cp2y, endX, endY);
+      if( typeof edge.data().sourceAnnotations != 'undefined' ) {
+        var lSourceAnnotations = edge.data().sourceAnnotations;
+        var displ      = Math.max(Math.min(((SPACE_MULT*annSize)/elen),(WIDTH_DISPL-annSize/elen)/lSourceAnnotations.length),0.0);
+        var startDispl = Math.min(START_DISPL+annSize/(2.0*elen),START_DISPL+WIDTH_DISPL/2.0);
+  
+        for (var i = 0; i < lSourceAnnotations.length; ++i) {
+          var annotation = lSourceAnnotations[i];
+  
+          var t = startDispl + i * displ;
+          var annPosX = qbezierAt(startX, details.cp2x, endX, t);
+          var annPosY = qbezierAt(startY, details.cp2y, endY, t);
+          
+          var bxdispl = qbezierDeltaAt(startX, details.cp2x, endX, t);
+          var bydispl = qbezierDeltaAt(startY, details.cp2y, endY, t);
+          var angle = 0.0;
+          if( bxdispl == 0 ) {
+            if( bydispl > 0 ) {
+              angle = 0;
+            } else {
+              angle = Math.PI;
+            }
+          } else {
+            angle = Math.atan( (bydispl/bxdispl) );
+            if( bxdispl < 0 ) {
+              angle += Math.PI;
+            }
+          }
+
+          context.fillStyle = annotation.color;
+          this.drawEdgeAnnotationShape(context, annotation.shape,
+              annPosX, annPosY, annSize, angle);
+        }
+      }
+      
+      if( typeof edge.data().targetAnnotations != 'undefined' ) {
+        var lTargetAnnotations = edge.data().targetAnnotations;
+        var displ      = Math.max(Math.min(((SPACE_MULT*annSize)/elen),(WIDTH_DISPL-annSize/elen)/lTargetAnnotations.length),0.0);
+        var startDispl = Math.min(START_DISPL+annSize/(2.0*elen),START_DISPL+WIDTH_DISPL/2.0);
+
+        for (var i = 0; i < lTargetAnnotations.length; i++) {
+          var annotation = lTargetAnnotations[i];
+
+          var t = 1.0 - startDispl - i * displ;
+          var annPosX = qbezierAt(startX, details.cp2x, endX, t);
+          var annPosY = qbezierAt(startY, details.cp2y, endY, t); 
+
+          var bxdispl = qbezierDeltaAt(startX, details.cp2x, endX, t);
+          var bydispl = qbezierDeltaAt(startY, details.cp2y, endY, t);
+          var angle = 0.0;
+          if( bxdispl == 0 ) {
+            if( bydispl > 0 ) {
+              angle = 0;
+            } else {
+              angle = Math.PI;
+            }
+          } else {
+            angle = Math.atan( (bydispl/bxdispl) );
+            if( bxdispl < 0 ) {
+              angle += Math.PI;
+            }
+          }
+
+          context.fillStyle = annotation.color;
+          this.drawEdgeAnnotationShape(context, annotation.shape,
+              annPosX, annPosY, annSize, angle+Math.PI);
+        }
+      }      
+
+    }
+  };
+
+  // Draw edge annotation shapes
+  CanvasRenderer.prototype.drawEdgeAnnotationShape = function(context, shape, annPosX, annPosY, size, angle) {
+  
+    context.translate(annPosX, annPosY);
+    
+    context.moveTo(0, 0);
+
+    context.rotate(angle);
+    context.scale(size, size);
+    
+    context.beginPath();
+    CanvasRenderer.annotationShapes[shape].draw(context);
+    context.closePath();
+    
+    context.fill();
+
+    context.scale(1/size, 1/size);
+    context.rotate(-angle);
+    
+    context.translate(-annPosX, -annPosY);
+  };
 
 })( cytoscape );

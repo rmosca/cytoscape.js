@@ -402,6 +402,7 @@
 			{ name: "overlay-padding", type: t.size },
 			{ name: "overlay-color", type: t.color },
 			{ name: "overlay-opacity", type: t.zeroOneNumber },
+      { name: "ann-size", type: t.size },
 
 			// these are just for nodes
 			{ name: "background-color", type: t.color },
@@ -535,6 +536,7 @@
 					"overlay-opacity": 0,
 					"overlay-color": "#000",
 					"overlay-padding": 10,
+          'ann-size': 3,
 
 					// node props
 					"background-color": "#888",
