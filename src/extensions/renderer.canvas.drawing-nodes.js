@@ -342,8 +342,7 @@
           var angle = annDispl * sAnnIndex;
           var ax = node._private.position.x + surfRingRadius * Math.sin(angle);
           var ay = node._private.position.y - surfRingRadius * Math.cos(angle);
-          context.fillStyle = annotation.color;
-          this.drawNodeAnnotationShape(context,annotation.shape,ax,ay,annSize,angle);
+          this.drawNodeAnnotationShape(context,annotation.shape,ax,ay,annSize,angle,annotation.color,annotation.enriched);
           ++sAnnIndex;
         }
       }
@@ -358,8 +357,7 @@
           var angle = annDispl * cAnnIndex;
           var ax = node._private.position.x + coreRingRadius * Math.sin(angle);
           var ay = node._private.position.y - coreRingRadius * Math.cos(angle);
-          context.fillStyle = annotation.color;
-          this.drawNodeAnnotationShape(context,annotation.shape,ax,ay,annSize,angle);
+          this.drawNodeAnnotationShape(context,annotation.shape,ax,ay,annSize,angle,annotation.color,annotation.enriched);
           ++cAnnIndex;
         }
       }
@@ -446,8 +444,7 @@
         var annotation = lNodeAnnotations[i];
         if( annotation.type == "unknown" ) {
           var ax = annXstart + annDispl * uAnnIndex;
-          context.fillStyle = annotation.color;
-          this.drawNodeAnnotationShape(context,annotation.shape,ax,annYstart,annSize,0);
+          this.drawNodeAnnotationShape(context,annotation.shape,ax,annYstart,annSize,0,annotation.color,annotation.enriched);
           ++uAnnIndex;
         }
       }
@@ -455,24 +452,41 @@
   };
 
   // Draw edge annotation shapes
-  CanvasRenderer.prototype.drawNodeAnnotationShape = function(context, shape, annPosX, annPosY, size, angle) {
+  CanvasRenderer.prototype.drawNodeAnnotationShape = function(context, shape, annPosX, annPosY, size, angle, annColor, enriched) {
   
     context.translate(annPosX, annPosY);
-    
     context.moveTo(0, 0);
-
     context.rotate(angle);
-    context.scale(size, size);
+
+    if( Boolean(enriched) ) {
+      var enrichedSize = size*1.3;
+      context.fillStyle = annColor;
+      context.scale(enrichedSize, enrichedSize);
+      context.beginPath();
+      CanvasRenderer.annotationShapes[shape].draw(context);
+      context.closePath();
+      context.fill();
+      context.scale(1/enrichedSize, 1/enrichedSize);
+      enrichedSize = size*1.0;
+      context.fillStyle = "#FFFFFF";
+      context.scale(enrichedSize, enrichedSize);
+      context.beginPath();
+      CanvasRenderer.annotationShapes[shape].draw(context);
+      context.closePath();
+      context.fill();
+      context.scale(1/enrichedSize, 1/enrichedSize);
+      size = 0.7 * size;
+    }
     
+    context.fillStyle = annColor;
+    context.scale(size, size);
     context.beginPath();
     CanvasRenderer.annotationShapes[shape].draw(context);
     context.closePath();
-    
     context.fill();
-
     context.scale(1/size, 1/size);
+
     context.rotate(-angle);
-    
     context.translate(-annPosX, -annPosY);
   };
 

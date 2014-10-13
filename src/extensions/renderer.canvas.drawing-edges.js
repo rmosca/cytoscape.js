@@ -473,9 +473,8 @@
           var annPosX = startX + exdispl * (startDispl + i * displ);
           var annPosY = startY + eydispl * (startDispl + i * displ);
 
-          context.fillStyle = annotation.color;
           this.drawEdgeAnnotationShape(context, annotation.shape,
-                annPosX, annPosY, annSize, angle);
+                annPosX, annPosY, annSize, angle, annotation.color, annotation.enriched);
         }
       }
 
@@ -489,9 +488,8 @@
           var annPosX = endX - exdispl * (startDispl + i * displ);
           var annPosY = endY - eydispl * (startDispl + i * displ);
           
-          context.fillStyle = annotation.color;
           this.drawEdgeAnnotationShape(context, annotation.shape,
-                annPosX, annPosY, annSize, angle+Math.PI);
+                annPosX, annPosY, annSize, angle+Math.PI, annotation.color, annotation.enriched);
         }
       }
       
@@ -546,9 +544,8 @@
             }
           }
 
-          context.fillStyle = annotation.color;
           this.drawEdgeAnnotationShape(context, annotation.shape,
-              annPosX, annPosY, annSize, angle);
+              annPosX, annPosY, annSize, angle, annotation.color, annotation.enriched);
         }
       }
       
@@ -583,9 +580,8 @@
             }
           }
 
-          context.fillStyle = annotation.color;
           this.drawEdgeAnnotationShape(context, annotation.shape,
-              annPosX, annPosY, annSize, angle);
+              annPosX, annPosY, annSize, angle, annotation.color, annotation.enriched);
         }
       }
       
@@ -617,9 +613,8 @@
             }
           }
 
-          context.fillStyle = annotation.color;
           this.drawEdgeAnnotationShape(context, annotation.shape,
-              annPosX, annPosY, annSize, angle+Math.PI);
+              annPosX, annPosY, annSize, angle+Math.PI, annotation.color, annotation.enriched);
         }
       }      
 
@@ -627,22 +622,42 @@
   }
 
   // Draw edge annotation shapes
-  CanvasRenderer.prototype.drawEdgeAnnotationShape = function(context, shape, annPosX, annPosY, size, angle) {
+  CanvasRenderer.prototype.drawEdgeAnnotationShape = function(context, shape, annPosX, annPosY, size, angle, annColor, enriched) {
   
     context.translate(annPosX, annPosY);
     
     context.moveTo(0, 0);
 
     context.rotate(angle);
+
+    if( Boolean(enriched) ) {
+      var enrichedSize = size*1.3;
+      context.fillStyle = annColor;
+      context.scale(enrichedSize, enrichedSize);
+      context.beginPath();
+      CanvasRenderer.annotationShapes[shape].draw(context);
+      context.closePath();
+      context.fill();
+      context.scale(1/enrichedSize, 1/enrichedSize);
+      enrichedSize = size*1.0;
+      context.fillStyle = "#FFFFFF";
+      context.scale(enrichedSize, enrichedSize);
+      context.beginPath();
+      CanvasRenderer.annotationShapes[shape].draw(context);
+      context.closePath();
+      context.fill();
+      context.scale(1/enrichedSize, 1/enrichedSize);
+      size = 0.7 * size;
+    }
+
+    context.fillStyle = annColor;
     context.scale(size, size);
-    
     context.beginPath();
     CanvasRenderer.annotationShapes[shape].draw(context);
     context.closePath();
-    
     context.fill();
-
     context.scale(1/size, 1/size);
+    
     context.rotate(-angle);
     
     context.translate(-annPosX, -annPosY);
