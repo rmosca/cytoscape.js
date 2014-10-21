@@ -302,6 +302,9 @@ gulp.task('docsrefs', function(){
 });
 
 gulp.task('docsdemoshots', function(next){
+  next(); // disable for now until phantomjs is fixed
+  return;
+
   var cwd = process.cwd();
 
   process.chdir('./documentation');
@@ -314,6 +317,10 @@ gulp.task('docsdemoshots', function(next){
 
 gulp.task('docspub', function(next){
   runSequence( 'version', 'docsver', 'docsjs', 'docsbuildlist', 'docsdemoshots', 'docs', 'docsmin', next );
+});
+
+gulp.task('docsrebuild', function(next){
+  runSequence( 'docs', 'docsmin', next );
 });
 
 gulp.task('pkgver', ['version'], function(){

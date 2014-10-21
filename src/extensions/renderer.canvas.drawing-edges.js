@@ -8,7 +8,7 @@
     var usePaths = CanvasRenderer.usePaths();
 
     // if bezier ctrl pts can not be calculated, then die
-    if( rs.badBezier ){
+    if( rs.badBezier || (rs.edgeType === 'bezier' && isNaN(rs.startX)) ){ // extra isNaN() for safari 7.1 b/c it mangles ctrlpt calcs
       return;
     }
 
@@ -173,18 +173,20 @@
 
     }
 
-    switch( type ){
-      case 'dotted':
-        canvasCxt.setLineDash([ 1, 1 ]);
-        break;
+    if( canvasCxt.setLineDash ){ // for very outofdate browsers
+      switch( type ){
+        case 'dotted':
+          canvasCxt.setLineDash([ 1, 1 ]);
+          break;
 
-      case 'dashed':
-        canvasCxt.setLineDash([ 6, 3 ]);
-        break;
+        case 'dashed':
+          canvasCxt.setLineDash([ 6, 3 ]);
+          break;
 
-      case 'solid':
-        canvasCxt.setLineDash([ ]);
-        break;
+        case 'solid':
+          canvasCxt.setLineDash([ ]);
+          break;
+      }
     }
 
     if( !pathCacheHit ){
@@ -209,7 +211,9 @@
     }
   
     // reset any line dashes
-    context.setLineDash([ ]);
+    if( context.setLineDash ){ // for very outofdate browsers
+      context.setLineDash([ ]);
+    }
 
   };
 

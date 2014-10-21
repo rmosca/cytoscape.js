@@ -456,6 +456,8 @@
       ( data = new RegExp( $$.style.types.data.regex ).exec( value ) ) ||
       ( layoutData = new RegExp( $$.style.types.layoutData.regex ).exec( value ) )
     ){
+      if( propIsBypass ){ return false; } // mappers not allowed in bypass
+      
       var isLayout = layoutData !== undefined;
       data = data || layoutData;
 
@@ -473,6 +475,8 @@
       ( mapData = new RegExp( $$.style.types.mapData.regex ).exec( value ) ) ||
       ( mapLayoutData = new RegExp( $$.style.types.mapLayoutData.regex ).exec( value ) )
     ){
+      if( propIsBypass ){ return false; } // mappers not allowed in bypass
+
       var isLayout = mapLayoutData !== undefined;
       mapData = mapData || mapLayoutData;
 
@@ -713,6 +717,7 @@
     this[i] = {
       selector: selector,
       properties: [],
+      mappedProperties: [],
       index: i
     };
 
@@ -766,6 +771,10 @@
 
       if( property.hasPie ){
         this._private.hasPie = true;
+      }
+
+      if( property.mapped ){
+        this[i].mappedProperties.push( property );
       }
 
       // add to core style if necessary
