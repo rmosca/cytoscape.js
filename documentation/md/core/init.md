@@ -12,7 +12,7 @@ To use Cytoscape.js in your HTML document:
 
 To install Cytoscape.js via npm:
 
-```
+```bash
 npm install cytoscape
 ```
 
@@ -117,7 +117,10 @@ var cy = cytoscape({
   userZoomingEnabled: true,
   panningEnabled: true,
   userPanningEnabled: true,
+  boxSelectionEnabled: false,
   selectionType: (isTouchDevice ? 'additive' : 'single'),
+  touchTapThreshold: 8,
+  desktopTapThreshold: 4,
   autolock: false,
   autoungrabify: false,
   autounselectify: false,
@@ -171,16 +174,20 @@ var cy = cytoscape({
 
 **`userPanningEnabled`** : Whether user events (e.g. dragging the graph background) are allowed to pan the graph.  Programmatic changes to pan are unaffected by this option.
 
+**`boxSelectionEnabled`** : Whether box selection (i.e. drag a box overlay around, and release it to select) is enabled.  If enabled, the user must taphold to pan the graph.
+
 **`selectionType`** : A string indicating the selection behaviour from user input.  By default, this is set automatically for you based on the type of input device detected.  On touch devices, `'additive'` is default &mdash; a new selection made by the user adds to the set of currenly selected elements.  On mouse-input devices, `'single'` is default &mdash; a new selection made by the user becomes the entire set of currently selected elements (i.e. the previous elements are unselected).
+
+**`touchTapThreshold`** & **`desktopTapThreshold`** : A nonnegative integer that indicates the maximum allowable distance that a user may move during a tap gesture, on touch devices and desktop devices respectively.  This makes tapping easier for users.  These values have sane defaults, so it is not advised to change these options unless you have very good reason for doing so.  Larger values will almost certainly have undesirable consequences.
 
 **`autoungrabify`** : Whether nodes should be ungrabified (not grabbable by user) by default (if `true`, overrides individual node state).
 
-**`autolock`** : Whether nodes should be locked (not movable at all) by default (if `true`, overrides individual node state).
+**`autolock`** : Whether nodes should be locked (not draggable at all) by default (if `true`, overrides individual node state).
 
-**`autounselectify`** : Whether nodes should be unselectified (immutible selection state) by default (if `true`, overrides individual element state).
+**`autounselectify`** : Whether nodes should be unselectified (immutable selection state) by default (if `true`, overrides individual element state).
 
 
-## Rendering options
+### Rendering options
 
 **`headless`** : A convenience option that initialises the instance to run headlessly.  You do not need to set this in environments that are implicitly headless (e.g. Node.js).  However, it is handy to set `headless: true` if you want a headless instance in a browser.
 

@@ -81,7 +81,7 @@
       userZoomingEnabled: defVal(true, options.userZoomingEnabled),
       panningEnabled: defVal(true, options.panningEnabled),
       userPanningEnabled: defVal(true, options.userPanningEnabled),
-      boxSelectionEnabled: defVal(true, options.boxSelectionEnabled),
+      boxSelectionEnabled: defVal(false, options.boxSelectionEnabled),
       autolock: defVal(false, options.autolock, options.autolockNodes),
       autoungrabify: defVal(false, options.autoungrabify, options.autoungrabifyNodes),
       autounselectify: defVal(false, options.autounselectify),
@@ -135,7 +135,8 @@
       textureOnViewport: options.textureOnViewport,
       wheelSensitivity: $$.is.number(options.wheelSensitivity) && options.wheelSensitivity > 0 ? options.wheelSensitivity : 1,
       motionBlur: options.motionBlur,
-      pixelRatio: $$.is.number(options.pixelRatio) && options.pixelRatio > 0 ? options.pixelRatio : (options.pixelRatio === 'auto' ? undefined : 1)
+      pixelRatio: $$.is.number(options.pixelRatio) && options.pixelRatio > 0 ? options.pixelRatio : (options.pixelRatio === 'auto' ? undefined : 1),
+      tapThreshold: defVal( $$.is.touch() ? 8 : 4, $$.is.touch() ? options.touchTapThreshold : options.desktopTapThreshold )
     }, options.renderer) );
 
     // trigger the passed function for the `initrender` event
@@ -262,6 +263,7 @@
           for( var j = index; j < elements.length; j++ ){
             var jid = elements[j]._private.data.id;
             id2index[ jid ]--;
+            elements[j]._private.index--;
           }
         }
       }

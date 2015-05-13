@@ -101,7 +101,7 @@
         return false;
       };
 
-      if (rs.edgeType === 'self') {
+      if (rs.edgeType === 'self' || rs.edgeType === 'compound') {
         if(
             (
               (inEdgeBB = $$.math.inBezierVicinity(x, y, rs.startX, rs.startY, rs.cp2ax, rs.cp2ay, rs.selfEdgeMidX, rs.selfEdgeMidY, widthSq))
@@ -490,7 +490,7 @@
 
       bpts.push( mid );
 
-      if( rs.edgeType === 'self' ){
+      if( rs.edgeType === 'self' || rs.edgeType === 'compound' ){
         rs.midX = rs.selfEdgeMidX;
         rs.midY = rs.selfEdgeMidY;
       } else {
@@ -674,11 +674,12 @@
     ds.top = '-9999px';
     ds.zIndex = '-1';
     ds.visibility = 'hidden';
+    ds.pointerEvents = 'none';
     ds.padding = '0';
     ds.lineHeight = '1';
 
     // put label content in div
-    div.innerText = text;
+    div.textContent = text;
 
     cache[cacheKey] = {
       width: div.clientWidth,
@@ -781,6 +782,8 @@
   CanvasRenderer.prototype.findEdgeControlPoints = function(edges) {
     if( !edges || edges.length === 0 ){ return; }
 
+    var cy = this.data.cy;
+    var hasCompounds = cy.hasCompoundNodes();
     var hashTable = {};
     var pairIds = [];
     var haystackEdges = [];
@@ -967,6 +970,9 @@
         var tgtH1 = rs.lastTgtCtlPtH;
         var tgtH2 = tgt.outerHeight();
 
+        var width1 = rs.lastW;
+        var width2 = eStyle['control-point-step-size'].pxValue;
+
         if( badBezier ){
           rs.badBezier = true;
         } else {
@@ -975,6 +981,7 @@
 
         if( srcX1 === srcX2 && srcY1 === srcY2 && srcW1 === srcW2 && srcH1 === srcH2
         &&  tgtX1 === tgtX2 && tgtY1 === tgtY2 && tgtW1 === tgtW2 && tgtH1 === tgtH2
+        &&  width1 === width2
         &&  ((edgeIndex1 === edgeIndex2 && numEdges1 === numEdges2) || edgeIsUnbundled) ){
           // console.log('edge ctrl pt cache HIT')
           continue; // then the control points haven't changed and we can skip calculating them
@@ -989,6 +996,7 @@
           rs.lastTgtCtlPtH = tgtH2;
           rs.lastEdgeIndex = edgeIndex2;
           rs.lastNumEdges = numEdges2;
+          rs.lastWidth = width2;
           // console.log('edge ctrl pt cache MISS')
         }
 
@@ -1009,12 +1017,59 @@
           rs.cp2ax = srcPos.x;
           rs.cp2ay = srcPos.y - (1 + Math.pow(srcH, 1.12) / 100) * loopDist * (j / 3 + 1);
           
-          rs.cp2cx = src._private.position.x - (1 + Math.pow(srcW, 1.12) / 100) * loopDist * (j / 3 + 1);
+          rs.cp2cx = srcPos.x - (1 + Math.pow(srcW, 1.12) / 100) * loopDist * (j / 3 + 1);
           rs.cp2cy = srcPos.y;
           
           rs.selfEdgeMidX = (rs.cp2ax + rs.cp2cx) / 2.0;
           rs.selfEdgeMidY = (rs.cp2ay + rs.cp2cy) / 2.0;
+        
+        // Compound edge
+        } else if(
+          hasCompounds &&
+          ( src.isParent() || src.isChild() || tgt.isParent() || tgt.isChild() ) &&
+          ( src.parents().anySame(tgt) || tgt.parents().anySame(src) )
+        ){
+
+          rs.edgeType = 'compound';
+
+          // because the line approximation doesn't apply for compound beziers
+          // (loop/self edges are already elided b/c of cheap src==tgt check)
+          rs.badBezier = false;
+
+          var j = i;
+          var loopDist = stepSize;
+
+          if( edgeIsUnbundled ){
+            j = 0;
+            loopDist = stepDist;
+          }
+
           
+          var loopW = 50;
+
+          var loopaPos = {
+            x: srcPos.x - srcW/2,
+            y: srcPos.y - srcH/2
+          };
+
+          var loopbPos = {
+            x: tgtPos.x - tgtW/2,
+            y: tgtPos.y - tgtH/2
+          };
+
+          var minCompoundStretch = 1;
+
+          rs.cp2ax = loopaPos.x;
+          rs.compoundStretchA = Math.max( minCompoundStretch, Math.log(srcW * 0.01) ); // avoids cases with impossible beziers
+          rs.cp2ay = loopaPos.y - (1 + Math.pow(loopW, 1.12) / 100) * loopDist * (j / 3 + 1) * rs.compoundStretchA;
+          
+          rs.compoundStretchB = Math.max( minCompoundStretch, Math.log(tgtW * 0.01) ); // avoids cases with impossible beziers
+          rs.cp2cx = loopbPos.x - (1 + Math.pow(loopW, 1.12) / 100) * loopDist * (j / 3 + 1) * rs.compoundStretchB;
+          rs.cp2cy = loopbPos.y;
+          
+          rs.selfEdgeMidX = (rs.cp2ax + rs.cp2cx) / 2.0;
+          rs.selfEdgeMidY = (rs.cp2ay + rs.cp2cy) / 2.0;
+
         // Straight edge
         } else if (pairEdges.length % 2 === 1
           && i === Math.floor(pairEdges.length / 2)
@@ -1189,10 +1244,11 @@
           x: Math.cos(angle),
           y: Math.sin(angle)
         };
-
-        rscratch.edgeType = 'haystack';
-        rscratch.haystack = true;
       }  
+
+      // always override as haystack in case set to different type previously
+      rscratch.edgeType = 'haystack';
+      rscratch.haystack = true;
     }
 
     return hashTable;
@@ -1212,7 +1268,7 @@
 
     var rs = edge._private.rscratch;
     
-    if (edge._private.rscratch.edgeType == 'self') {
+    if (rs.edgeType == 'self' || rs.edgeType == 'compound') {
       
       var cp = [rs.cp2cx, rs.cp2cy];
       

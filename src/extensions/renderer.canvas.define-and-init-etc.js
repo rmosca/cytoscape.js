@@ -102,6 +102,9 @@
     this.motionBlurEnabled = options.motionBlur === undefined ? true : options.motionBlur; // on by default
     this.forcedPixelRatio = options.pixelRatio;
     this.motionBlur = true; // for initial kick off
+    this.tapThreshold = options.tapThreshold;
+    this.tapThreshold2 = options.tapThreshold * options.tapThreshold;
+    this.tapholdDuration = 500;
 
     this.load();
   }
@@ -169,6 +172,14 @@
       var b = binding;
 
       b.target.removeEventListener(b.event, b.handler, b.useCapture);
+    }
+
+    if( this.removeObserver ){
+      this.removeObserver.disconnect();
+    }
+
+    if( this.labelCalcDiv ){
+      document.body.removeChild(this.labelCalcDiv);
     }
   };
 

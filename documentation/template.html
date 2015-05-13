@@ -24,7 +24,7 @@
 
 		<div id="content">
 
-			<h1 id="top" class="title">Cytoscape.js <span class="description">Graph theory (a.k.a. network) library for analysis and visualisation (compatible with CommonJS/Node.js, AMD/Require.js, Bower, npm, jQuery, and plain JavaScript)</span><span class="version">{{version}}</span></h1>
+			<h1 id="top" class="title">Cytoscape.js <span class="version">{{version}}</span></h1>
 			<div class="subtitle">Graph theory (a.k.a. network) library for analysis and visualisation (compatible with <a target="_blank" href="http://wiki.commonjs.org/wiki/CommonJS">CommonJS</a>/<a target="_blank" href="http://nodejs.org/">Node.js</a>, <a target="_blank" href="http://requirejs.org">AMD/Require.js</a>, <a target="_blank" href="http://jquery.com/">jQuery</a>, <a target="_blank" href="http://bower.io">Bower</a>, <a target="_blank" href="http://npmjs.org">npm</a>, and plain JavaScript)</div>
 			
 			<div class="buttons-subtitle">
@@ -34,12 +34,20 @@
 			</div>
 
 			<div class="links">
+				<a href="#extensions"><span class="icon-puzzle-piece"></span> Extensions</a> |
 				<a target="_blank" href="https://twitter.com/cytoscape"><span class="icon-twitter"></span> Twitter</a> |
 				<a target="_blank" href="https://github.com/cytoscape/cytoscape.js/issues/new"><span class="icon-bug"></span> File an issue or request a feature</a> |
 				<a target="_blank" href="http://stackoverflow.com/questions/tagged/cytoscape.js"><span class="icon-question"></span> Previous questions</a> |
 				<a target="_blank" href="http://stackoverflow.com/questions/ask?tags=cytoscape.js"><span class="icon-comments"></span> Ask a code help question</a> |
 				<a target="_blank" href="https://github.com/cytoscape/cytoscape.js/milestones"><span class="icon-calendar"></span> Version milestones/changelogs</a> |
 				<a target="_blank" href="http://cytoscape.org"><span class="icon-desktop"></span> Cytoscape desktop</a>
+			</div>
+
+			<div class="links likes">
+				<span class="like-label">Like Cytoscape.js?</span> |
+				<a target="_blank" href="https://github.com/cytoscape/cytoscape.js"><span class="icon-star"></span> Star it on GitHub</a> |
+				<a target="_blank" href="https://twitter.com/intent/tweet?status=Cytoscape.js,%20a%20graph%20%28a.k.a.%20network%29%20library%20for%20analysis%20and%20visualisation%20js.cytoscape.org"><span class="icon-twitter"></span> Share it on Twitter</a> |
+				<a target="_blank" href="https://plus.google.com/share?url=js.cytoscape.org"><span class="icon-google-plus"></span> Share it on Google+</a>
 			</div>
 
 			<!--
@@ -70,7 +78,7 @@
 				{{#if extensions}}
 					<ul>
 					{{#each extensions}}
-						<li><a href="{{url}}"><code>{{name}}</code></a> : {{descr}}</li>
+						<li><a target="_blank" href="{{url}}"><code>{{name}}</code></a> : {{descr}}</li>
 					{{/each}}
 					</ul>
 				{{/if}}
@@ -82,13 +90,13 @@
 				{{#if demo}}
 
 					<div class="gallery-full-demo">			
-						<button class="run"><span class="icon-play"></span></button>
-
 						<div class="gallery-full-padder"></div>
 
-						<a class="gallery-full-link" target="_blank" href="{{demo.srcUrl}}">
+						<a class="gallery-full-link" target="_blank" href="{{demo.viewUrl}}">
 							<span class="gallery-full-preview" style="background-image: url('{{demo.imgUrl}}');"></span>
 						</a>
+
+						<button class="run"><span class="icon-play"></span></button>
 						
 					</div>
 
@@ -105,13 +113,20 @@
 					<div class="gallery-demos">
 					{{#each demos}}
 						<div class="gallery-demo">
-							<div class="gallery-title">
-								<span class="gallery-name">{{name}}</span>
-							</div>
-							
-							<a class="gallery-link" target="_blank" href="{{srcUrl}}">
+						
+							<a class="gallery-link" target="_blank" href="{{viewUrl}}">
 								<span class="gallery-preview" style="background-image: url('{{imgUrl}}');"></span>
 							</a>
+
+							<div class="gallery-title">
+								<span class="gallery-name">{{name}}</span>
+								<span class="gallery-download">
+									<a href="{{downloadUrl}}"><span class="icon-download-alt"></span></a>
+								</span>
+								<span class="gallery-github">
+									<a href="{{githubUrl}}"><span class="icon-github-alt"></span></a>
+								</span>
+							</div>
 							
 						</div>
 					{{/each}}
@@ -147,8 +162,8 @@
 						{{/if}}
 
 						<h3>Options</h3>
-						<button class="run run-inline-code"><span class="icon-play"></span></button>
 						<pre><code class="lang-js">{{{layout.optionsFormatted}}}</code></pre>
+						<button class="run run-inline-code"><span class="icon-play"></span></button>
 					{{/if}}
 
 					{{#each fns}}
@@ -157,7 +172,7 @@
 							
 							{{#if pureAliases}}
 							<div class="pure-aliases">
-								Aliases:
+								<span class="important-indicator"></span> Aliases:
 
 								{{#each pureAliases}}
 									<span class="pure-alias">
@@ -244,7 +259,7 @@
 						<span class="icon-caret-down expanded-icon"></span>
 						<span class="icon-caret-right collapsed-icon"></span>
 					</span>{{/if}}
-					<a href="#{{id}}"><span class="icon-bookmark bookmark-icon"></span> {{& name}}</a>
+					<a class="toclink" href="#{{id}}"><span class="icon-bookmark bookmark-icon"></span> {{& name}}</a>
 				</div>
 
 				{{#each sections}}
@@ -253,11 +268,11 @@
 							<span class="icon-caret-down expanded-icon"></span>
 							<span class="icon-caret-right collapsed-icon"></span>
 						</span>{{/if}}
-						<a href="#{{id}}"><span class="icon-bookmark bookmark-icon"></span> {{& name}}</a>
+						<a class="toclink" href="#{{id}}"><span class="icon-bookmark bookmark-icon"></span> {{& name}}</a>
 					</div>
 
 					{{#each fns}}
-						<div class="section lvl3"><a href="#{{id}}"><span class="icon-bookmark bookmark-icon"></span> {{name}}() {{#if aliases}}et al{{/if}}</a></div>
+						<div class="section lvl3"><a class="toclink" href="#{{id}}"><span class="icon-bookmark bookmark-icon"></span> {{name}}() {{#if aliases}}et al{{/if}}</a></div>
 					{{/each}}
 				{{/each}}
 			{{/each}}
@@ -266,18 +281,24 @@
 		</div>
 
 
-
-		<div id="cy-title"><pre class="content"></pre></div>
-		<div id="cy-label" class="hidden"><code>window.cy</code></div>
-		<div id="cy" class="hidden"></div>
-		<div id="cy-refresh" class="hidden">
-			<span class="link plain-link icon-refresh"></span>
-		</div>
-		<div id="cy-show">
-			<span class="link plain-link icon-plus"></span>
-		</div>
-		<div id="cy-hide" class="hidden">
-			<span class="link plain-link icon-minus"></span>
+		<div id="orphaned-cy-container">
+			<div id="cy-etc" class="hidden">
+				<div id="cy-arrow">
+					<span class="icon-arrow-down"></span>
+				</div>
+				<div id="cy-title"><pre class="content"></pre></div>
+				<div id="cy-label" class="hidden"><code>window.cy</code></div>
+				<div id="cy" class="hidden"></div>
+				<div id="cy-refresh" class="hidden">
+					<span class="link plain-link icon-refresh"></span>
+				</div>
+				<div id="cy-show">
+					<span class="link plain-link icon-plus"></span>
+				</div>
+				<div id="cy-hide" class="hidden">
+					<span class="link plain-link icon-minus"></span>
+				</div>
+			</div>
 		</div>
 
 

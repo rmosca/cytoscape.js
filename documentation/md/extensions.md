@@ -2,11 +2,7 @@ The above extensions are a curated list.  To add your extension, [please submit 
 
 ## API
 
-The API makes it very easy to write an extension, following this format:
-
-```
-cytoscape( type, name, extension );
-```
+The API makes it very easy to write an extension, following this format: `cytoscape( type, name, extension );`
 
 The value of `type` can take on the following values:
 
@@ -17,6 +13,10 @@ The value of `type` can take on the following values:
 
 The `name` argument indicates the name of the extension, which should be a single word in lower case.
 
+
+## Autoscaffolding
+
+There exists [a Slush project for Cytoscape.js](https://github.com/cytoscape/slush-cytoscape-extension) such that the full project scaffolding for a new extension is automatically generated for you.  By following the included instructions, you can easily create Cytoscape.js extensions that are well organised, easily maintained, and published to npm and bower.
 
 
 ## Functions

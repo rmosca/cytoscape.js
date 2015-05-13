@@ -95,15 +95,55 @@
       }
     },
 
-    touch: function(){
-      return window && ( ('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch );
-    },
-
     boundingBox: function(obj){
       return $$.is.plainObject(obj) && 
         $$.is.number(obj.x1) && $$.is.number(obj.x2) &&
         $$.is.number(obj.y1) && $$.is.number(obj.y2)
       ;
+    },
+
+    touch: function(){
+      return window && ( ('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch );
+    },
+
+    gecko: function(){
+      return typeof InstallTrigger !== 'undefined' || ('MozAppearance' in document.documentElement.style);
+    },
+
+    webkit: function(){
+      return typeof webkitURL !== 'undefined' || ('WebkitAppearance' in document.documentElement.style);
+    },
+
+    chromium: function(){
+      return typeof chrome !== 'undefined';
+    },
+
+    khtml: function(){
+      return navigator.vendor.match(/kde/i); // TODO probably a better way to detect this...
+    },
+
+    khtmlEtc: function(){
+      return $$.is.khtml() || $$.is.webkit() || $$.is.blink();
+    },
+
+    trident: function(){
+       return typeof ActiveXObject !== 'undefined' || /*@cc_on!@*/false;
+    },
+
+    windows: function(){
+      return typeof navigator !== 'undefined' && navigator.appVersion.match(/Win/i);
+    },
+
+    mac: function(){
+      return typeof navigator !== 'undefined' && navigator.appVersion.match(/Mac/i);
+    },
+
+    linux: function(){
+      return typeof navigator !== 'undefined' && navigator.appVersion.match(/Linux/i);
+    },
+
+    unix: function(){
+      return typeof navigator !== 'undefined' && navigator.appVersion.match(/X11/i);
     }
   };  
   

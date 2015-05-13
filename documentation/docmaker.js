@@ -20,7 +20,7 @@ mdRend.code = function(code, lang){
     button = '<button class="run run-inline-code"><span class="icon-play"></span></button>';
   }
 
-  return button + rendCode.call(this, code, lang);
+  return rendCode.call(this, code, lang) + button;
 };
 
 try {
@@ -126,9 +126,10 @@ function parseSubsections( section ){
 }
 
 function populateDemo( demo ){
-  demo.embedUrl = 'http://jsbin.com/' + demo.id + '/latest/embed?output';
-  demo.srcUrl = 'http://jsbin.com/' + demo.id + '/latest/edit?js,output';
+  demo.viewUrl = 'http://jsbin.com/gist/' + demo.id + '?js,output';
   demo.imgUrl = 'img/demos/' + demo.id + '.png';
+  demo.githubUrl = 'https://gist.github.com/' + demo.id;
+  demo.downloadUrl = 'https://gist.github.com/' + demo.id + '/download';
 }
 
 function compileConfig( config ){

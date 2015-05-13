@@ -1,5 +1,5 @@
 {
-  "version": "2.3.3",
+  "version": "2.3.11",
 
   "fnArgLinks": {
     "selector": "#selectors",
@@ -25,21 +25,19 @@
     {
       "name": "Demos",
       "demos": [
-        { "name": "Initialisation", "id": "urabis" },
-        { "name": "Visual style", "id": "aqupun" },
-        { "name": "Linkout example", "id": "pajoc" },
-        { "name": "Compound nodes", "id": "domek" },
-        { "name": "Animated BFS", "id": "qohop" },
-        { "name": "GeneMANIA export", "id": "wuvac" },
-        { "name": "Images", "id": "kahar" },
-        { "name": "qTip extension", "id": "royel" },
-        { "name": "Pie style", "id": "yozazu" },
-        { "name": "Multiple instances", "id": "zurup" },
-        { "name": "Performance tuning", "id": "yeqom" },
-        { "name": "AngularJS example", "id": "kewem" }
-      ],
-      "disabledDemos": [
-        { "name": "Tokyo railway", "id": "suteci" }
+        { "name": "Tokyo railways", "id": "f64e811fc3311414e083" },
+        { "name": "Performance tuning", "id": "57e7cc43342193d9d21a" },
+        { "name": "qTip extension", "id": "546dd8ca4872cc87106a" },
+        { "name": "Animated BFS", "id": "7e2f4d29ff7ef1a1bba5" },
+        { "name": "Compound nodes", "id": "5b192c88616af2f75344" },
+        { "name": "Images", "id": "aedff159b0df05ccfaa5" },
+        { "name": "GeneMANIA export", "id": "29419ca0e6430a7185a5" },       
+        { "name": "Linkout example", "id": "eb861f83fb741628342f" },
+        { "name": "Pie style", "id": "173313aba1f31cae49a5" },
+        { "name": "Multiple instances", "id": "310dca83ba6970812dd0" },
+        { "name": "AngularJS example", "id": "a1aea574f0e248b2b38e" },
+        { "name": "Visual style", "id": "b7c65115947d9e0e8ec8" },
+        { "name": "Initialisation", "id": "621d51ea7de19608127e" }
       ]
     },
 
@@ -383,7 +381,7 @@
 
             {
               "name": "cy.panningEnabled",
-              "descr": "Get or set whether panning is enabled.",
+              "descr": "Get or set whether panning is enabled.  If `cy.boxSelectionEnabled() === true`, then the user must taphold to initiate panning.",
               "formats": [
                 {
                   "descr": "Get whether panning is enabled."
@@ -401,7 +399,7 @@
 
             {
               "name": "cy.userPanningEnabled",
-              "descr": "Get or set whether panning by user events (e.g. dragging the graph background) is enabled.",
+              "descr": "Get or set whether panning by user events (e.g. dragging the graph background) is enabled.  If `cy.boxSelectionEnabled() === true`, then the user must taphold to initiate panning.",
               "formats": [
                 {
                   "descr": "Get whether user panning is enabled."
@@ -527,7 +525,7 @@
 
             {
               "name": "cy.boxSelectionEnabled",
-              "descr": "Get or set whether box selection is enabled.",
+              "descr": "Get or set whether box selection is enabled.   If enabled, the user must hold left-click to initiate panning.",
               "formats": [
                 {
                   "descr": "Get whether box selection is enabled."
@@ -739,7 +737,7 @@
 
             {
               "name": "cy.makeLayout",
-              "descr": "Get a new layout, which can be used to algorithmically positions the nodes in the graph.",
+              "descr": "Get a new layout, which can be used to algorithmically position the nodes in the graph.",
               "formats": [
                 {
                   "args": [
@@ -2958,18 +2956,18 @@
     {
       "name": "Architecture",
       "md": "architecture",
-      "demo": { "id": "mexemi", "name": "A diagramme of the architecture of Cytoscape.js, made using Cytoscape.js" }
+      "demo": { "id": "689efca4fcb0fd05671b", "name": "A diagramme of the architecture of Cytoscape.js, made using Cytoscape.js" }
     },
 
     {
       "name": "Extensions",
       "extensions": [
-        { 
-          "name": "panzoom", 
-          "github": "cytoscape/cytoscape.js-panzoom",
-          "descr": "A panzoom UI widget."
+        {
+          "name": "cerebralweb",
+          "github": "silviafrias/cerebral-web",
+          "descr": "A plugin to enable fast and interactive visualisation of molecular interaction networks stratified based on subcellular localisation or other custom annotation."
         },
-        
+
         { 
           "name": "cxtmenu",
           "github": "cytoscape/cytoscape.js-cxtmenu",
@@ -2989,9 +2987,33 @@
         },
 
         { 
+          "name": "noderesize", 
+          "github": "curupaco/cytoscape.js-noderesize",
+          "descr": "A plugin that creates a node resize control."
+        },
+
+        { 
+          "name": "panzoom", 
+          "github": "cytoscape/cytoscape.js-panzoom",
+          "descr": "A panzoom UI widget."
+        },
+
+        { 
           "name": "qtip", 
           "github": "cytoscape/cytoscape.js-qtip",
           "descr": "A wrapper that lets you use qTips on graph elements or the graph background."
+        },
+
+        {
+          "name": "supportimages",
+          "github": "curupaco/cytoscape.js-supportimages",
+          "descr": "A plugin that enables support images on Cytoscape.js"
+        },
+
+        {
+          "name": "toolbar",
+          "github": "bdparrish/cytoscape.js-toolbar",
+          "descr": "A plugin for Cytoscape.js that allows a user to create a custom toolbar to add next to a Cytoscape core instance."
         }
       ],
       "md": "extensions"

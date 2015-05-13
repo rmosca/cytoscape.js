@@ -95,6 +95,8 @@ cytoscape({
 
 In addition to specifying the value of a property outright, the developer may also use a mapper to dynamically specify the property value.
 
+<span class="important-indicator"></span> If a mapping is defined, either define the mapped data for all elements or use selectors to limit the mapping to elements that have the mapped data defined.  For example, the selector `[foo]` will apply only to elements with the data field `foo` defined.
+
 **`data()`** specifies a direct mapping to an element's data field.  For example, `data(descr)` would map a property to the value in an element's `descr` field in its data (i.e. `ele.data("descr")`).  This is useful for mapping to properties like label text content (the `content` property).
 
 **`mapData()`** specifies a linear mapping to an element's data field.  For example, `data(weight, 0, 100, blue, red)` maps an element's weight to gradients between blue and red for weights between 0 and 100.  An element with `ele.data("weight") === 0` would  be mapped to blue, for instance.  Elements whose values fall outside of the specified range are mapped to the extremity values.  In the previous example, an element with `ele.data("weight") === -1` would be mapped to blue.
@@ -131,7 +133,7 @@ These node body properties only apply to compound nodes (i.e. nodes who have emb
 
 A background image may be applied to a node's body:
 
- * **`background-image`** : The URL that points to the image that should be used as the node's background.  PNG, JPG, and SVG are supported formats.
+ * **`background-image`** : The URL that points to the image that should be used as the node's background.  PNG, JPG, and SVG are supported formats.  You may use a [data URI](https://en.wikipedia.org/wiki/Data_URI_scheme) to use embedded images, thereby saving a HTTP request.
  * **`background-image-opacity`** : The opacity of the background image.
  * **`background-fit`** : How the background image is fit to the node; may be `none` for original size, `contain` to fit inside node, or `cover` to cover the node.
  * **`background-repeat`** : Whether to repeat the background image; may be `no-repeat`, `repeat-x`, `repeat-y`, or `repeat`.
@@ -169,14 +171,6 @@ These properties affect the styling of an edge's line:
 
 
 
-# Visibility
-
-* **`display`** : Whether to display the element; may be `element` for displayed or `none` for not displayed.  Note that a `display: none` bezier edge does not take up space in its bundle.
-* **`visibility`** : Whether the element is visible; may be `visible` or `hidden`.  Note that a `visibility: hidden` bezier edge still takes up space in its bundle.
-* **`opacity`** : The opacity of the element, ranging from 0 to 1.  Note that the opacity of a compound node parent affects the effective opacity of its children.
-* **`z-index`** : An integer value that affects the relative draw order of elements.  In general, an element with a higher `z-index` will be drawn on top of an element with a lower `z-index`.  Note that edges are under nodes despite `z-index`, except when necessary for compound nodes.
-
-
 ## Edge arrow
 
 Towards the source node:
@@ -204,6 +198,16 @@ Towards the target node, positioned in the middle of the edge:
  * **`mid-target-arrow-fill`** : The fill state of the edge's target arrow; may be `filled` or `hollow`.
 
 
+
+## Visibility
+
+* **`display`** : Whether to display the element; may be `element` for displayed or `none` for not displayed.  Note that a `display: none` bezier edge does not take up space in its bundle.
+* **`visibility`** : Whether the element is visible; may be `visible` or `hidden`.  Note that a `visibility: hidden` bezier edge still takes up space in its bundle.
+* **`opacity`** : The opacity of the element, ranging from 0 to 1.  Note that the opacity of a compound node parent affects the effective opacity of its children.
+* **`z-index`** : An integer value that affects the relative draw order of elements.  In general, an element with a higher `z-index` will be drawn on top of an element with a lower `z-index`.  Note that edges are under nodes despite `z-index`, except when necessary for compound nodes.
+
+
+
 ## Labels
 
  * **`color`** :  The colour of the element's label.
@@ -219,7 +223,7 @@ Towards the target node, positioned in the middle of the edge:
  * **`text-outline-width`** : The size of the outline on label text.
  * **`min-zoomed-font-size`** : If zooming makes the effective font size of the label smaller than this, then no label is shown.
 
- These properties can only be used on node labels:
+These properties can only be used on node labels:
 
  * **`text-halign`** : The vertical alignment of a label; may have value `left`, `center`, or `right`.
  * **`text-valign`** : The vertical alignment of a label; may have value `top`, `center`, or `bottom`.

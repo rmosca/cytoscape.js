@@ -3,7 +3,7 @@
 }
 
 body {
-	font: 14pt Helvetica Neue, Helvetica, Arial, sans-serif;
+	font: 14pt Helvetica Neue, Helvetica, Adobe Helvetica, DejaVu Sans, Arial, sans-serif;
 	line-height: 1.5;
 	-webkit-text-size-adjust: 100%;
 	background: #fff;
@@ -22,23 +22,36 @@ img {
 	max-width: 80%;
 }
 
-#cy {
-	position: fixed;
+#orphaned-cy-container {
+	position: absolute;
+	left: -99999px;
+	top: -99999px;
+}
+
+#cy-etc {
+	position: relative;
+	margin: 1em;
 	z-index: 999;
-	right: 0;
-	bottom: 0;
 	height: 15em;
 	width: 15em;
-	background: rgba(255, 255, 255, 0.66);
+	margin-top: 2.5em;
 	border: 1px solid rgba(127, 127, 127, 0.5);
-	border-right: none;
-	border-bottom: none;
+	background: rgba(255, 255, 255, 0.66);
+}
+
+#cy {
+	position: absolute;
+	z-index: 999;
+	left: 0;
+	top: 0;
+	height: 100%;
+	width: 100%;
 }
 
 #cy-title {
-	position: fixed;
-	right: 0;
-	bottom: 15em;
+	position: absolute;
+	left: 0;
+	bottom: 100%;
 	width: 15em;
 	text-align: left;
 	background: rgba(255, 255, 255, 0.5);
@@ -53,11 +66,24 @@ img {
 	font-size: 0.8em;
 }
 
+#cy-arrow {
+	position: absolute;
+	left: 0;
+	width: 100%;
+	text-align: center;
+	top: -1.33em;
+	font-size: 3em;
+	z-index: 9999;
+	opacity: 0.333;
+	color: #888;
+	pointer-events: none;
+}
+
 #cy-label {
-	position: fixed;
-	bottom: 15em;
-	margin-bottom: -0.666em;
-	right: 0;
+	position: absolute;
+	top: 0;
+	left: 0;
+	margin-top: -1em;
 	width: 15em;
 	text-align: center;
 	z-index: 1000;
@@ -84,7 +110,7 @@ img {
 #cy-refresh,
 #cy-show,
 #cy-hide {
-	position: fixed;
+	position: absolute;
 	bottom: 13.75em;
 	right: 13.75em;
 	line-height: 1;
@@ -96,6 +122,7 @@ img {
 
 #cy-hide {
 	right: 0;
+	display: none !important;
 }
 
 #cy-show {
@@ -104,6 +131,7 @@ img {
 	background: rgba(255, 255, 255, 0.66);
 	border-radius: 0;
 	border: 1px solid #ccc;
+	display: none;
 }
 
 button {
@@ -121,6 +149,7 @@ button:active {
 
 .run {
 	margin: 0 2em;
+	margin-top: -2.25em;
 	position: absolute;
 	right: 0;
 	opacity: 0.666;
@@ -226,8 +255,10 @@ button:active {
 .gallery-demo {
 	position: relative;
 	float: left;
-	margin: 0 1em 1em 0;
-	width: 200px;
+	margin: 0 0.5em 0.5em 0;
+	width: 10em;
+	height: 13em;
+	line-height: 1.15;
 }
 
 .gallery-full-demo{
@@ -251,6 +282,11 @@ button:active {
 	font-size: 0.8em;
 }
 
+.gallery-download,
+.gallery-github {
+	margin: 0 0.125em;
+}
+
 .gallery-name {
 	
 }
@@ -259,8 +295,8 @@ button:active {
 .gallery-link-overlay,
 .gallery-preview {
 	display: block;
-	width: 200px;
-	height: 200px;
+	width: 10em;
+	height: 10em;
 	border: 1px solid #ddd;
 	border-radius: 0.25em;
 	background-size: contain;
@@ -455,11 +491,20 @@ button:active {
 }
 
 .links {
-	color: #ccc;
+	font-weight: 200;
 }
 
 .links a {
 	/*white-space: nowrap;*/
+}
+
+.likes {
+	margin-top: 1em;
+	font-weight: 200;
+}
+
+.like-label {
+	color: #000;
 }
 
 .buttons-subtitle {
@@ -514,10 +559,16 @@ th, td {
 
 a,
 .link {
-	color: #4183C4;
+	color: inherit;
+	border-bottom: 2px solid rgba(65, 131, 196, 0.333);
 	text-decoration: none;
 	border-radius: 0.125em;
 	cursor: pointer;
+}
+
+a.light,
+a.toclink {
+	border-bottom: 2px solid rgba(65, 131, 196, 0.166);
 }
 
 a.button {
@@ -562,10 +613,10 @@ ul {
 code,
 pre {
 	font-family: Consolas, "Liberation Mono", Courier, monospace;
-	border: 1px solid #ddd;
+	border: 1px solid rgba(221, 221, 221, 0.666);
 	border-radius: 0.25em;
 	font-size: 1em;
-	background: #fafafa;
+	background: rgba(250, 250, 250, 0.2);
 }
 
 pre {
@@ -605,7 +656,6 @@ pre code {
 }
 
 .function .pure-aliases {
-	color: #888;
 	font-size: 0.8em;
 }
 

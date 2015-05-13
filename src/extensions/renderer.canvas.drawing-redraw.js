@@ -177,11 +177,11 @@
     var motionBlur = options.motionBlur !== undefined ? options.motionBlur : r.motionBlur;
     motionBlur = motionBlur && !forcedContext && r.motionBlurEnabled;
 
-    if( r.motionBlurTimeout ){
+    if( motionBlur && r.motionBlurTimeout ){
       clearTimeout( r.motionBlurTimeout );
     }
 
-    if( this.redrawTimeout ){
+    if( !forcedContext && this.redrawTimeout ){
       clearTimeout( this.redrawTimeout );
     }
     this.redrawTimeout = null;
@@ -452,7 +452,7 @@
 
         setContextTransform( context );
 
-        if (data.select[4] == 1) {
+        if( data.select[4] == 1 && r.hoverData.selecting ){
           var zoom = data.cy.zoom();
           var borderWidth = coreStyle['selection-box-border-width'].value / zoom;
           
@@ -484,7 +484,7 @@
           }
         }
 
-        if( data.bgActivePosistion ){
+        if( data.bgActivePosistion && !r.hoverData.selecting ){
           var zoom = data.cy.zoom();
           var pos = data.bgActivePosistion;
 
