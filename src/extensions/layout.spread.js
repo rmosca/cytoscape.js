@@ -22,7 +22,7 @@
     // If it is set to -1.0 the amount of expansion is automatically
     // calculated based on the minDist, the aspect ratio and the
     // number of nodes
-    maxFruchtermanReingoldIterations: 50, // Maximum number of initial force-directed iterations
+    maxFruchtermanReingoldIterations: 200, // Maximum number of initial force-directed iterations
     maxExpandIterations: 4, // Maximum number of expanding iterations
     boundingBox: undefined // Constrain layout bounds; { x1, y1, x2, y2 } or { x1, y1, w, h }
   };
@@ -81,12 +81,12 @@
       var cHeight = cy.height();
       var simulationBounds = options.boundingBox ? $$.util.makeBoundingBox( options.boundingBox ) : null;
       var padding = options.padding;
-      var simBBFactor = Math.max( 1, Math.log(nodes.length) * 0.8 );
+      var simBBFactor = Math.max( 1, Math.log(nodes.length) * 0.55 );
       
       if( nodes.length < 100 ){
         simBBFactor /= 2;
       }
-
+      
       layout.trigger( {
         type: 'layoutstart',
         layout: layout
@@ -106,10 +106,11 @@
         simBB.y2 = simulationBounds.y2;
       }
 
-      simBB.x1 += padding;
-      simBB.y1 += padding;
-      simBB.x2 -= padding;
-      simBB.y2 -= padding;
+      // Is this required? Since we later do cy.fit( >> options.padding << );
+      //simBB.x1 += padding;
+      //simBB.y1 += padding;
+      //simBB.x2 -= padding;
+      //simBB.y2 -= padding;
 
       var width = simBB.x2 - simBB.x1;
       var height = simBB.y2 - simBB.y1;
@@ -175,7 +176,7 @@
           } );
         } );
 
-      //Decleration
+      //Declaration
       var t1 = $$.Thread();
       // And to add the required scripts
       //EXTERNAL 1
