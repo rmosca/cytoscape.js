@@ -155,7 +155,8 @@
       { name: 'transition-property', type: t.propList },
       { name: 'transition-duration', type: t.time },
       { name: 'transition-delay', type: t.time },
-
+      { name: "ann-size", type: t.size },
+      
       // node body
       { name: 'height', type: t.autoSize },
       { name: 'width', type: t.autoSize },
@@ -308,6 +309,7 @@
           'transition-property': 'none',
           'transition-duration': 0,
           'transition-delay': 0,
+          'ann-size': 3,
 
           // node props
           'background-blacken': 0,

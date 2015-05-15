@@ -22,7 +22,7 @@
     // If it is set to -1.0 the amount of expansion is automatically
     // calculated based on the minDist, the aspect ratio and the
     // number of nodes
-    maxFruchtermanReingoldIterations: 200, // Maximum number of initial force-directed iterations
+    maxFruchtermanReingoldIterations: 50, // Maximum number of initial force-directed iterations
     maxExpandIterations: 4, // Maximum number of expanding iterations
     boundingBox: undefined // Constrain layout bounds; { x1, y1, x2, y2 } or { x1, y1, w, h }
   };
@@ -81,7 +81,7 @@
       var cHeight = cy.height();
       var simulationBounds = options.boundingBox ? $$.util.makeBoundingBox( options.boundingBox ) : null;
       var padding = options.padding;
-      var simBBFactor = Math.max( 1, Math.log(nodes.length) * 0.55 );
+      var simBBFactor = Math.max( 1, Math.log(nodes.length) * 0.6 );
       
       if( nodes.length < 100 ){
         simBBFactor /= 2;
